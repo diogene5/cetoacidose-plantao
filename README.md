@@ -2,6 +2,8 @@
 
 Ferramenta web de apoio à beira-leito para o manejo da **cetoacidose diabética (CAD)** no adulto. Página única, sem dependências, funciona offline.
 
+🔗 **Site:** https://diogene5.github.io/cetoacidose-plantao/
+
 > ⚠️ **Apoio à conduta — não substitui protocolo institucional nem julgamento clínico.** Conteúdo educacional. Sempre confirme doses e adapte ao seu serviço.
 
 ## O que tem
