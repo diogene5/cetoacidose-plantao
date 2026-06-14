@@ -1,0 +1,347 @@
+% ============================================================================
+%  FOLHA DE CONTROLE — CETOACIDOSE DIABÉTICA (CAD)
+%  Beira-leito · A4 paisagem · P&B · frente e verso
+%  Compilar com: pdflatex
+% ============================================================================
+\documentclass[10pt]{article}
+
+\usepackage[a4paper,landscape,margin=7mm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage[table]{xcolor}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+
+\definecolor{black}{gray}{0}
+\definecolor{mid}{gray}{0.45}
+\definecolor{line}{gray}{0.78}
+\definecolor{shade}{gray}{0.94}
+\definecolor{shadeDark}{gray}{0.88}
+
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\fboxsep}{2.5pt}
+\setlength{\fboxrule}{0.7pt}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\newcommand{\kicker}[1]{{\fontsize{7}{8.5}\selectfont\bfseries\color{black}\MakeUppercase{#1}}}
+\newcommand{\kickerwhite}[1]{{\fontsize{7}{8.5}\selectfont\bfseries\color{white}\MakeUppercase{#1}}}
+\newcommand{\colhead}[1]{{\fontsize{6.8}{8}\selectfont\bfseries\color{white}\strut\MakeUppercase{#1}}}
+\newcommand{\colheadpair}[2]{{\fontsize{6.8}{8}\selectfont\bfseries\color{white}\strut\shortstack{\MakeUppercase{#1}\\\MakeUppercase{#2}}}}
+\newcommand{\val}[1]{{\bfseries #1}}
+\newcommand{\unit}[1]{{\color{mid}\fontsize{7}{8.5}\selectfont #1}}
+\newcommand{\hint}[1]{{\color{mid}\fontsize{7}{8.5}\selectfont #1}}
+\newcommand{\alert}[1]{{\bfseries\MakeUppercase{#1}}}
+\newcommand{\fieldline}[1]{\textcolor{line}{\rule[-0.3mm]{#1}{0.55pt}}}
+
+\newcommand{\sectionhead}[1]{%
+  \par\vspace{0.4mm}%
+  {\bfseries\fontsize{8}{9}\selectfont\MakeUppercase{#1}}%
+  \par\vspace{0.3mm}{\color{black}\hrule height 0.7pt}\vspace{0.4mm}%
+}
+
+\newcommand{\hourrow}[2]{%
+  \ifnum#2=1 \rowcolor{shade}\fi
+  \rule{0pt}{2.6mm}#1 & & & & & & & & & \\\cline{1-10}%
+}
+
+\begin{document}
+
+% ═══════════════════════════════════════════════════════════════════════
+%  N1 — IDENTIFICAÇÃO
+% ═══════════════════════════════════════════════════════════════════════
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+  {\fontsize{17}{18}\selectfont\bfseries Cetoacidose Diabética}\\[0.4mm]
+  {\fontsize{8.5}{10}\selectfont\bfseries Folha de controle — plantão}\\[0.4mm]
+  {\fontsize{7}{8.5}\selectfont\color{mid}Instrumento de apoio à conduta. Não substitui protocolo institucional.}
+\end{minipage}%
+\hfill%
+\begin{minipage}[c]{0.40\textwidth}\raggedleft
+  \setlength{\tabcolsep}{2pt}
+  {\fontsize{7.5}{9}\selectfont
+  \begin{tabular}{@{}r l@{}}
+    \kicker{Paciente} & \fieldline{42mm} \\[0.9mm]
+    \kicker{Prontuário / Leito} & \fieldline{42mm} \\[0.9mm]
+    \kicker{Peso} & \fieldline{17mm}\,\unit{kg}
+      \quad \kicker{Idade} \fieldline{11mm}\,\unit{anos} \\[0.9mm]
+    \kicker{Início do tratamento} & \fieldline{42mm} \\
+  \end{tabular}}
+\end{minipage}
+
+\vspace{0.5mm}{\color{black}\hrule height 1pt}\vspace{0.8mm}
+
+% ═══════════════════════════════════════════════════════════════════════
+%  N2 — REFERÊNCIA RÁPIDA
+% ═══════════════════════════════════════════════════════════════════════
+\noindent
+\begin{minipage}[t]{0.31\textwidth}
+  \sectionhead{Gravidade (pior parâmetro)}
+  \setlength{\tabcolsep}{3pt}
+  \renewcommand{\arraystretch}{1.25}
+  {\fontsize{7.5}{9}\selectfont
+  \begin{tabularx}{\linewidth}{@{}X >{\centering\arraybackslash}m{14mm} >{\centering\arraybackslash}m{17mm} >{\columncolor{shadeDark}\centering\arraybackslash}m{17mm}@{}}
+    \rule{0pt}{2.4mm} & \kicker{Leve} & \kicker{Moderada} & \kicker{Grave}\\
+    \midrule
+    pH arterial & 7,25--7,30 & 7,00--7,24 & \textbf{$<$7,00} \\
+    Bicarbonato & 15--18 & 10--14 & \textbf{$<$10} \\
+    Consciência & consciente & consciente ou rebaixado & \textbf{estupor ou coma} \\
+  \end{tabularx}}
+  \vspace{0.5mm}
+  \hint{Diagnóstico: hiperglicemia ($>$250 mg/dL, ou qualquer valor com iSGLT2) + acidose (pH $<$7,30 ou HCO$_3^-$ $<$18 mEq/L) + cetose documentada + AG $>$10 mEq/L.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.31\textwidth}
+  \sectionhead{Metas durante o tratamento}
+  \setlength{\tabcolsep}{3pt}
+  {\fontsize{7.5}{9}\selectfont
+  \begin{tabularx}{\linewidth}{@{}X r@{}}
+    Queda da glicemia — adulto & \val{50--75}\,\unit{mg/dL/h} \\
+    \rowcolor{shade} Queda da glicemia — criança & \val{$\leq$90}\,\unit{mg/dL/h} \\
+    Associar glicose ao soro se & glicemia \val{$<$250}\,\unit{mg/dL} \\
+    \rowcolor{shade} Potássio sérico alvo & \val{4,0--5,0}\,\unit{mEq/L} \\
+    Diurese mínima & \val{$>$0,5}\,\unit{mL/kg/h} \\
+  \end{tabularx}}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.34\textwidth}
+  \sectionhead{Condutas indispensáveis}
+  \setlist[enumerate]{leftmargin=4mm,itemsep=0.35mm,topsep=0.25mm,label=\textbf{\arabic*.}}
+  {\fontsize{7.5}{9}\selectfont
+  \begin{enumerate}
+    \item Dosar potássio \textbf{antes} de iniciar insulina. Se K$^+$ $<$3,5 mEq/L: repor e só então infundir insulina.
+    \item Glicemia abaixo de 250 mg/dL \textbf{não} significa resolução — manter insulina e associar solução glicosada.
+    \item Resolução exige normalização do \textbf{gap aniônico}, não apenas da glicemia.
+    \item Na transição para via subcutânea, manter infusão endovenosa por \val{2 h} após a primeira dose subcutânea.
+  \end{enumerate}}
+\end{minipage}
+
+\vspace{0.4mm}
+
+% ═══════════════════════════════════════════════════════════════════════
+%  N3 — REGISTRO
+% ═══════════════════════════════════════════════════════════════════════
+% ---- Linha 1: monitorização horária (beira-leito) ----
+\newcommand{\hrowH}[2]{%
+  \ifnum#2=1 \rowcolor{shade}\fi
+  \rule{0pt}{2.6mm}#1 & & & & & & & & & & & \\\cline{1-12}}
+\sectionhead{Monitorização horária — beira-leito (a cada 1 h)}
+\setlength{\tabcolsep}{2pt}
+\arrayrulecolor{line}
+\renewcommand{\arraystretch}{1.22}
+{\fontsize{7.5}{8.5}\selectfont
+\begin{tabularx}{\textwidth}{@{}|
+  >{\centering\arraybackslash}p{9mm}|
+  >{\centering\arraybackslash}p{13.5mm}|
+  >{\centering\arraybackslash}p{12mm}|
+  >{\centering\arraybackslash}p{7mm}|
+  >{\centering\arraybackslash}p{7mm}|
+  >{\centering\arraybackslash}p{10mm}|
+  >{\centering\arraybackslash}p{12mm}|
+  >{\centering\arraybackslash}p{11mm}|
+  >{\centering\arraybackslash}p{12mm}|
+  >{\centering\arraybackslash}p{10mm}|
+  >{\centering\arraybackslash}p{11mm}|Y|@{}}
+\hline
+\rowcolor{black}
+\colhead{Hora} &
+\colheadpair{Glicemia}{capilar} &
+\colhead{PA} &
+\colhead{FC} &
+\colhead{FR} &
+\colheadpair{Tax}{SpO$_2$} &
+\colheadpair{Consc.}{Glasgow} &
+\colheadpair{Diurese}{mL} &
+\colheadpair{Insulina}{UI/h} &
+\colheadpair{Fluido}{mL/h} &
+\colheadpair{Balanço}{acum.} &
+\colheadpair{Intercorrência /}{conduta} \\
+\hrowH{H0}{0}
+\hrowH{H1}{1} \hrowH{H2}{0} \hrowH{H3}{1} \hrowH{H4}{0}
+\hrowH{H5}{1} \hrowH{H6}{0} \hrowH{H7}{1} \hrowH{H8}{0}
+\hrowH{H9}{1} \hrowH{H10}{0} \hrowH{H11}{1} \hrowH{H12}{0}
+\hline
+\end{tabularx}}
+\renewcommand{\arraystretch}{1.15}
+\arrayrulecolor{black}
+
+\vspace{0.6mm}
+
+% ---- Linha 2: laboratório seriado (a cada 2--4 h) ----
+\newcommand{\hrowL}[2]{%
+  \ifnum#2=1 \rowcolor{shade}\fi
+  \rule{0pt}{2.6mm}#1 & & & & & & & & \\\cline{1-9}}
+\sectionhead{Laboratório seriado — gasometria e eletrólitos (a cada 2--4 h)}
+\setlength{\tabcolsep}{2pt}
+\arrayrulecolor{line}
+\renewcommand{\arraystretch}{1.22}
+{\fontsize{7.5}{8.5}\selectfont
+\begin{tabularx}{\textwidth}{@{}|
+  >{\centering\arraybackslash}p{14mm}|
+  >{\centering\arraybackslash}p{10mm}|
+  >{\centering\arraybackslash}p{12mm}|
+  >{\centering\arraybackslash}p{9mm}|
+  >{\centering\arraybackslash}p{9mm}|
+  >{\centering\arraybackslash}p{16mm}|
+  >{\centering\arraybackslash}p{16mm}|
+  >{\centering\arraybackslash}p{20mm}|Y|@{}}
+\hline
+\rowcolor{black}
+\colhead{Hora / data} &
+\colhead{pH} &
+\colheadpair{HCO$_3^-$}{mEq/L} &
+\colhead{AG} &
+\colhead{K$^+$} &
+\colheadpair{Na$^+$}{(corrig.)} &
+\colhead{Cl$^-$} &
+\colheadpair{Cetonemia}{$\beta$-OHB} &
+\colhead{Conduta / ajuste} \\
+\hrowL{H0}{0}
+\hrowL{+2 h}{1} \hrowL{+4 h}{0} \hrowL{+6 h}{1}
+\hrowL{+8 h}{0} \hrowL{+10 h}{1} \hrowL{+12 h}{0}
+\hline
+\end{tabularx}}
+\renewcommand{\arraystretch}{1.15}
+\arrayrulecolor{black}
+
+\vspace{0.25mm}
+\hint{Horária: glicemia capilar, sinais vitais, diurese, insulina e balanço. Laboratório: gasometria venosa, eletrólitos e cetonemia ($\beta$-hidroxibutirato) — alvo real da resolução é o ânion gap, não a glicemia. AG e HCO$_3$ em mEq/L · insulina regular endovenosa (UI/h).}
+
+\vspace{0.35mm}
+
+% ═══════════════════════════════════════════════════════════════════════
+%  N3b — ALGORITMO (SWIMLANE)
+% ═══════════════════════════════════════════════════════════════════════
+\sectionhead{Algoritmo de manejo — três linhas em paralelo no tempo}
+\vspace{0.4mm}
+\begin{center}
+\begin{tikzpicture}[x=1mm,y=1mm,
+  lanebox/.style={draw=black,line width=0.4pt,fill=shade,rounded corners=0.5mm,minimum width=58mm,minimum height=11mm,align=center,inner sep=1pt,font=\fontsize{6.4}{7.4}\selectfont},
+  phdr/.style={font=\fontsize{7}{8}\selectfont\bfseries,align=center},
+  lanelbl/.style={font=\fontsize{7.5}{8.5}\selectfont\bfseries,align=center},
+  fl/.style={-{Stealth[length=1.6mm,width=1.4mm]},line width=0.5pt}]
+  \node[font=\fontsize{6}{7}\selectfont\itshape,anchor=west] at (22,55){tempo $\rightarrow$};
+  \node[phdr] at (55,52){Admissão \textperiodcentered{} 1ª hora};
+  \node[phdr] at (120,52){Titulação (1/1 h)};
+  \node[phdr] at (185,52){Glicemia $<$ 250};
+  \node[phdr] at (250,52){Resolução \textperiodcentered{} transição};
+  \node[lanelbl] at (11,42){Fluido};
+  \node[lanelbl] at (11,25){Insulina};
+  \node[lanelbl] at (11,8){Potássio};
+  \node[lanebox] at (55,42){SF 0,9\% 15--20 mL/kg};
+  \node[lanebox] at (120,42){250--500 mL/h\\0,45\% se Na$^+$ corr.\ normal};
+  \node[lanebox] at (185,42){Associar glicose (SG)};
+  \node[lanebox] at (250,42){Manutenção até dieta oral};
+  \node[lanebox] at (55,25){Regular IV 0,1 UI/kg/h\\{\itshape só após checar K$^+$}};
+  \node[lanebox] at (120,25){Titular pela queda\\50--75 mg/dL/h};
+  \node[lanebox] at (185,25){0,02--0,05 UI/kg/h\\{\bfseries não suspender}};
+  \node[lanebox] at (250,25){Insulina SC\\manter IV 1--2 h};
+  \node[lanebox] at (55,8){K$^+$ $<$ 3,3 $\rightarrow$ repor e\\{\bfseries adiar insulina}};
+  \node[lanebox] at (120,8){Manter K$^+$ 4--5 mEq/L};
+  \node[lanebox] at (185,8){Vigiar hipocalemia};
+  \node[lanebox] at (250,8){Reavaliar eletrólitos};
+  \draw[fl] (84,25) -- (91,25);
+  \draw[fl] (149,25) -- (156,25);
+  \draw[fl] (214,25) -- (221,25);
+  \draw[fl,dashed] (55,13.5) -- (55,19.5);
+  \node[font=\fontsize{6}{7}\selectfont\itshape,anchor=west] at (58,16.5){K$^+$ libera a insulina};
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.4mm}
+
+% ═══════════════════════════════════════════════════════════════════════
+%  N4 — TRATAMENTO
+% ═══════════════════════════════════════════════════════════════════════
+\noindent
+\begin{minipage}[t]{0.24\textwidth}
+  \sectionhead{Reposição volêmica}
+  {\fontsize{7.5}{9}\selectfont
+  \textbf{Adulto} \\
+  1ª hora: SF 0,9\% \val{15--20}\,\unit{mL/kg} (máx.\ \val{1,5}\,\unit{L})\\
+  Manutenção: \val{250--500}\,\unit{mL/h}\\
+  Se sódio corrigido $\geq$135 mEq/L: SF 0,45\%\\[0.35mm]
+  \textbf{Criança} \\
+  Expansão: SF 0,9\% \val{10}\,\unit{mL/kg} (repetir só se choque)\\
+  Volume total: até \val{1,5--2} vezes o volume de manutenção\\[0.35mm]
+  \hint{Sódio corrigido = Na$^+$ + 1,6$\times$[(glicemia$-$100)/100]}}
+\end{minipage}\hfill
+{\color{line}\vrule width 0.5pt}\hfill
+\begin{minipage}[t]{0.24\textwidth}
+  \sectionhead{Insulina regular endovenosa}
+  {\fontsize{7.5}{9}\selectfont
+  \textbf{Adulto:} \val{0,1}\,\unit{UI/kg/h} (bolus inicial 0,1 UI/kg, opcional)\\
+  \textbf{Criança:} \val{0,05--0,1}\,\unit{UI/kg/h}, após 1 h, \alert{sem bolus inicial}\\[0.35mm]
+  \textbf{Bomba de infusão}\\
+  50 UI + 50 mL SF 0,9\% $\Rightarrow$ 1 UI/mL\\
+  Desprezar 20 mL do equipo (volume morto)\\
+  Taxa: \val{1 mL/h = 1 UI/h}\\[0.35mm]
+  Se glicemia $<$250 mg/dL: \val{0,05}\,\unit{UI/kg/h} + solução glicosada}
+\end{minipage}\hfill
+{\color{line}\vrule width 0.5pt}\hfill
+\begin{minipage}[t]{0.26\textwidth}
+  \sectionhead{Potássio no soro}
+  \setlength{\tabcolsep}{2pt}
+  {\fontsize{7.5}{9}\selectfont
+  \begin{tabularx}{\linewidth}{@{}c c X@{}}
+    \kicker{K$^+$} & \kicker{Insulina} & \kicker{Cloreto de K}\\
+    \midrule
+    \cellcolor{shadeDark}\textbf{$<$3,5} & \cellcolor{shadeDark}\alert{não iniciar} & \cellcolor{shadeDark}20--40 mEq/h \\
+    \rowcolor{shade} 3,5--5,5 & pode infundir & 20--30 mEq/L \\
+    $>$5,5 & pode infundir & não repor \\
+  \end{tabularx}\\[0.35mm]
+  KCl 19,1\%: \val{7,8}\,\unit{mL/20 mEq} \quad 10\%: \val{14,9}\,\unit{mL/20 mEq}\\[0.2mm]
+  \hint{Máx.\ 40 mEq/L em VP. Nunca em bolus endovenoso.}}
+\end{minipage}\hfill
+{\color{line}\vrule width 0.5pt}\hfill
+\begin{minipage}[t]{0.24\textwidth}
+  \sectionhead{Glicose (glicemia $<$ 250 mg/dL)}
+  {\fontsize{7.5}{9}\selectfont
+  \textbf{Two-bag}\\
+  Duas bolsas de soro em Y, mesma taxa e mesma reposição de K$^+$; uma com glicose. Ajustar a mistura conforme a glicemia.\\[0.35mm]
+  \textbf{Método convencional}\\
+  SG 50\% \val{50}\,\unit{mL} por frasco de SF $\approx$ SG 5\%; trocar a solução no alvo.\\[0.35mm]
+  \alert{Não interromper insulina endovenosa} — associar solução glicosada.}
+\end{minipage}
+
+\vspace{0.35mm}
+
+% ═══════════════════════════════════════════════════════════════════════
+%  N5 — DESFECHO E ALERTA
+% ═══════════════════════════════════════════════════════════════════════
+\noindent
+\fcolorbox{black}{shade}{%
+  \begin{minipage}[t]{0.665\textwidth}
+  \kicker{Critérios de resolução — todos necessários}\\[0.4mm]
+  {\fontsize{7.5}{9}\selectfont
+  Glicemia \val{$<$200}\,\unit{mg/dL} \;\textbullet\;
+  pH \val{$\geq$7,30} \;\textbullet\;
+  AG \val{$\leq$12}\,\unit{mEq/L} \;\textbullet\;
+  \textbf{paciente consciente, em dieta oral}}\\[0.35mm]
+  \kicker{Transição para insulina subcutânea}\\[0.3mm]
+  {\fontsize{7.5}{9}\selectfont
+  Insulina basal SC
+  $\rightarrow$ refeição + insulina de ação rápida
+  $\rightarrow$ \textbf{manter endovenosa por 2 h}
+  $\rightarrow$ suspender bomba
+  $\rightarrow$ glicemia capilar em 1 h e 3 h}
+  \end{minipage}}%
+\hfill
+\setlength{\fboxrule}{1pt}%
+\fcolorbox{black}{white}{%
+  \begin{minipage}[t]{0.305\textwidth}
+  \colorbox{black}{\parbox{\dimexpr\linewidth-2\fboxsep\relax}{\vspace{0.4mm}\hspace{1mm}\kickerwhite{Atenção — criança: edema cerebral}\vspace{0.4mm}}}\\[0.4mm]
+  \hspace{1mm}{\fontsize{7}{8.5}\selectfont
+  Cefaleia, vômitos, bradicardia com hipertensão arterial, rebaixamento de consciência.
+  Manitol \val{0,5--1}\,\unit{g/kg} ou NaCl 3\% \val{2,5--5}\,\unit{mL/kg}.
+  Não adiar neuroimagem.}
+  \end{minipage}}
+
+\end{document}

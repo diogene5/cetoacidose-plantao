@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cetoacidose Diabética — apoio ao plantão</title>
+<meta name="description" content="Ferramenta de apoio à beira-leito para o manejo da cetoacidose diabética (adulto): card de referência, checklist do plantão, algoritmo animado e dúvidas frequentes.">
+<style>
+  :root{
+    --bg:#f6f7f9; --surface:#ffffff; --surface2:#eef1f4; --line:#d8dee6;
+    --text:#1a1f26; --muted:#5b6675; --faint:#8a94a3;
+    --accent:#0f7e6b; --accent-bg:#e3f4f0;
+    --info:#1763a6; --info-bg:#e6f0fb;
+    --warn:#9a6300; --warn-bg:#fcefd6;
+    --danger:#b22a2a; --danger-bg:#fbe9e9;
+    --ok:#2f7d22; --ok-bg:#e8f4df;
+    --radius:12px; --radius-sm:8px;
+    --shadow:0 1px 2px rgba(20,30,45,.06),0 2px 8px rgba(20,30,45,.05);
+    --maxw:980px;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#10141a; --surface:#171c24; --surface2:#1f2630; --line:#2c343f;
+      --text:#e7ebf0; --muted:#9aa6b4; --faint:#6b7686;
+      --accent:#39b39a; --accent-bg:#13332e;
+      --info:#5aa3e6; --info-bg:#122638;
+      --warn:#e0a534; --warn-bg:#322713;
+      --danger:#e86b6b; --danger-bg:#331717;
+      --ok:#74c45f; --ok-bg:#1a2c14;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 2px 10px rgba(0,0,0,.25);
+    }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+    line-height:1.55;-webkit-font-smoothing:antialiased;font-size:16px}
+  h1,h2,h3{line-height:1.25;font-weight:600;margin:0 0 .4em}
+  h2{font-size:1.35rem;letter-spacing:-.01em}
+  h3{font-size:1.02rem}
+  p{margin:.4em 0}
+  a{color:var(--info)}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 16px}
+  code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;
+    background:var(--surface2);padding:.05em .35em;border-radius:5px}
+
+  /* header */
+  header.hero{padding:26px 0 14px;border-bottom:1px solid var(--line)}
+  .hero h1{font-size:1.7rem;letter-spacing:-.02em;margin-bottom:.15em}
+  .hero .sub{color:var(--muted);font-size:1rem}
+  .disclaimer{margin-top:12px;display:flex;gap:8px;align-items:flex-start;
+    background:var(--warn-bg);color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 30%,transparent);
+    border-radius:var(--radius-sm);padding:9px 12px;font-size:.85rem}
+  .disclaimer b{color:var(--warn)}
+
+  /* nav */
+  nav.tabs{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+  nav.tabs .wrap::-webkit-scrollbar{display:none}
+  nav.tabs a{flex:0 0 auto;padding:13px 14px;color:var(--muted);text-decoration:none;
+    font-size:.92rem;font-weight:500;border-bottom:2px solid transparent;white-space:nowrap}
+  nav.tabs a:hover{color:var(--text)}
+  nav.tabs a.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+  section{padding:30px 0;border-bottom:1px solid var(--line);scroll-margin-top:54px}
+  section>.wrap>.lead{color:var(--muted);max-width:62ch;margin-top:-2px;margin-bottom:18px}
+
+  /* generic cards */
+  .grid{display:grid;gap:14px}
+  .cols-2{grid-template-columns:repeat(2,1fr)}
+  .cols-3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:760px){.cols-2,.cols-3{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px 15px;box-shadow:var(--shadow)}
+  .card h3{margin-bottom:.5em;display:flex;align-items:center;gap:7px;font-size:.78rem;
+    text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+  .card.k h3{color:var(--warn)} .card.danger h3{color:var(--danger)}
+  .kv{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-top:1px solid var(--line);
+    font-size:.92rem}
+  .kv:first-of-type{border-top:0}
+  .kv .v{font-weight:600;text-align:right;white-space:nowrap}
+  .kv .v small{font-weight:400;color:var(--muted)}
+  .pill{display:inline-block;font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:999px;
+    background:var(--accent-bg);color:var(--accent)}
+  .sev{display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr;font-size:.84rem;border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--line)}
+  .sev>div{padding:6px 8px;border-top:1px solid var(--line)}
+  .sev>div:nth-child(-n+4){border-top:0;background:var(--surface2);font-weight:600;font-size:.74rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+  .sev .rowlabel{font-weight:600;color:var(--text)}
+  .sev .grave{color:var(--danger);font-weight:600}
+
+  .btn{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--text);
+    font:inherit;font-weight:500;font-size:.88rem;padding:8px 13px;border-radius:var(--radius-sm);
+    cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .btn:hover{border-color:var(--accent);color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.primary:hover{filter:brightness(1.05);color:#fff}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+
+  /* checklist */
+  .progress{flex:1;min-width:120px;height:8px;background:var(--surface2);border-radius:999px;overflow:hidden}
+  .progress>i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+  .progress-label{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+  .phase{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow)}
+  .phase>.ph-head{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--surface2);border-bottom:1px solid var(--line)}
+  .phase .ph-num{flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;
+    display:grid;place-items:center;font-size:.8rem;font-weight:600}
+  .phase .ph-title{font-weight:600;font-size:.98rem}
+  .phase .ph-sub{color:var(--muted);font-size:.82rem;margin-left:auto}
+  .items{list-style:none;margin:0;padding:6px 6px}
+  .items li{display:flex;gap:10px;align-items:flex-start;padding:8px 8px;border-radius:var(--radius-sm)}
+  .items li:hover{background:var(--surface2)}
+  .items input[type=checkbox]{margin-top:2px;width:18px;height:18px;accent-color:var(--accent);flex:0 0 auto;cursor:pointer}
+  .items label{cursor:pointer;font-size:.94rem}
+  .items .note{display:block;color:var(--muted);font-size:.82rem;margin-top:1px}
+  .items li.done label{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--faint)}
+  .items li.gate{background:var(--warn-bg)}
+  .items li.locked{opacity:.55}
+  .items li.locked input{cursor:not-allowed}
+  .lockmsg{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;font-weight:600;color:var(--warn);
+    background:var(--warn-bg);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);
+    padding:1px 7px;border-radius:999px;margin-left:6px}
+  .tag{font-size:.7rem;font-weight:600;padding:1px 7px;border-radius:999px;margin-left:4px}
+  .tag.k{background:var(--warn-bg);color:var(--warn)}
+  .tag.crit{background:var(--danger-bg);color:var(--danger)}
+
+  /* algorithm animation */
+  .algo{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px;box-shadow:var(--shadow);overflow-x:auto}
+  .swim{min-width:680px;display:grid;grid-template-columns:84px repeat(4,1fr);gap:8px;align-items:stretch}
+  .swim .phhead{text-align:center;font-size:.78rem;font-weight:600;color:var(--muted);
+    padding:4px 2px;border-radius:6px;transition:.25s;align-self:center}
+  .swim .phhead.on{color:var(--accent);background:var(--accent-bg)}
+  .swim .lanelab{display:flex;align-items:center;font-weight:600;font-size:.86rem;color:var(--muted)}
+  .swim .cell{background:var(--surface2);border:1px solid var(--line);border-radius:var(--radius-sm);
+    padding:8px 9px;font-size:.82rem;transition:.25s;position:relative}
+  .swim .cell.on{border-color:var(--accent);background:var(--accent-bg);
+    box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 30%,transparent)}
+  .swim .cell b{display:block;font-size:.78rem}
+  .swim .cell .mut{color:var(--muted);font-size:.76rem}
+  .swim .cell .badge{position:absolute;top:-9px;right:8px;font-size:.66rem;font-weight:700;padding:1px 7px;
+    border-radius:999px;opacity:0;transform:translateY(3px);transition:.25s}
+  .swim .cell .badge.show{opacity:1;transform:none}
+  .badge.gate{background:var(--warn);color:#fff} .badge.loop{background:var(--info);color:#fff}
+  .badge.glu{background:var(--ok);color:#fff} .badge.res{background:var(--accent);color:#fff}
+  .lane-f .cell.on{--x:0} /* placeholder */
+  .algo-caption{margin-top:12px;background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:var(--radius-sm);padding:10px 12px;font-size:.9rem;min-height:48px}
+  .algo-caption b{color:var(--accent)}
+  .algo-controls{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+  .stepdots{display:flex;gap:6px;margin-left:auto}
+  .stepdots i{width:8px;height:8px;border-radius:50%;background:var(--line);transition:.2s}
+  .stepdots i.on{background:var(--accent);transform:scale(1.25)}
+
+  /* faq */
+  details.faq{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    margin-bottom:10px;box-shadow:var(--shadow);overflow:hidden}
+  details.faq>summary{cursor:pointer;padding:13px 15px;font-weight:600;font-size:.96rem;list-style:none;
+    display:flex;align-items:center;gap:9px}
+  details.faq>summary::-webkit-details-marker{display:none}
+  details.faq>summary .chev{margin-left:auto;color:var(--faint);transition:.2s;flex:0 0 auto}
+  details.faq[open]>summary .chev{transform:rotate(90deg)}
+  details.faq>summary .qtag{font-size:.66rem;font-weight:700;padding:1px 7px;border-radius:999px;flex:0 0 auto}
+  .qtag.k{background:var(--warn-bg);color:var(--warn)}
+  .qtag.trap{background:var(--danger-bg);color:var(--danger)}
+  .qtag.calc{background:var(--info-bg);color:var(--info)}
+  details.faq .body{padding:0 15px 14px;font-size:.93rem;color:var(--text)}
+  details.faq .body .ans{background:var(--accent-bg);border-radius:var(--radius-sm);padding:9px 12px;
+    border-left:3px solid var(--accent);margin-top:2px}
+  details.faq .body p{margin:.5em 0}
+
+  footer{padding:26px 0 60px;color:var(--muted);font-size:.84rem}
+  footer .wrap>div{margin:.3em 0}
+  .src{font-size:.8rem}
+
+  /* print: only the card */
+  @media print{
+    nav.tabs,.algo-controls,.toolbar,footer,.disclaimer,header.hero .sub,
+    #checklist,#algoritmo,#duvidas{display:none!important}
+    section{border:0;padding:6px 0}
+    body{background:#fff;font-size:11px}
+    .card{box-shadow:none;break-inside:avoid}
+    .hero h1{font-size:16px}
+  }
+  .skip{position:absolute;left:-999px}
+  .seetoo{font-size:.82rem;color:var(--muted);margin-top:6px}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <h1>Cetoacidose diabética — apoio ao plantão</h1>
+    <div class="sub">Card de beira-leito, checklist, algoritmo animado e dúvidas reais do plantão · adulto</div>
+    <div class="disclaimer">
+      <span aria-hidden="true">⚠️</span>
+      <div><b>Ferramenta de apoio à conduta — não substitui protocolo institucional nem julgamento clínico.</b>
+      Confira doses e adapte ao seu serviço. Conteúdo educacional.</div>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Seções">
+  <div class="wrap">
+    <a href="#card" class="active">Card beira-leito</a>
+    <a href="#checklist">Checklist do plantão</a>
+    <a href="#algoritmo">Algoritmo animado</a>
+    <a href="#duvidas">Dúvidas &amp; armadilhas</a>
+  </div>
+</nav>
+
+<!-- ============ CARD ============ -->
+<section id="card">
+  <div class="wrap">
+    <h2>Card de beira-leito</h2>
+    <p class="lead">Referência rápida para consulta durante a conduta. Use o botão imprimir para gerar um cartão físico.</p>
+    <div class="toolbar">
+      <button class="btn" onclick="window.print()">🖨️ Imprimir card</button>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="card">
+        <h3>Diagnóstico</h3>
+        <div class="kv"><span>Hiperglicemia</span><span class="v">&gt; 250 mg/dL <small>(qualquer valor com iSGLT2)</small></span></div>
+        <div class="kv"><span>Acidose</span><span class="v">pH &lt; 7,30 <small>ou</small> HCO₃⁻ &lt; 18</span></div>
+        <div class="kv"><span>Cetose</span><span class="v">cetonemia / cetonúria</span></div>
+        <div class="kv"><span>Ânion gap</span><span class="v">&gt; 10–12 mEq/L</span></div>
+        <p class="seetoo">Procure o fator precipitante: infecção, IAM, má adesão/omissão de insulina, drogas, iSGLT2.</p>
+      </div>
+
+      <div class="card">
+        <h3>Gravidade <span class="pill">pior parâmetro</span></h3>
+        <div class="sev" role="table" aria-label="Gravidade">
+          <div></div><div>Leve</div><div>Moderada</div><div>Grave</div>
+          <div class="rowlabel">pH</div><div>7,25–7,30</div><div>7,00–7,24</div><div class="grave">&lt; 7,00</div>
+          <div class="rowlabel">HCO₃⁻</div><div>15–18</div><div>10–14</div><div class="grave">&lt; 10</div>
+          <div class="rowlabel">Consciência</div><div>alerta</div><div>alerta/sonol.</div><div class="grave">estupor/coma</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Reposição volêmica</h3>
+        <div class="kv"><span>1ª hora</span><span class="v">SF 0,9% 15–20 mL/kg <small>(máx ~1,5 L)</small></span></div>
+        <div class="kv"><span>Manutenção</span><span class="v">250–500 mL/h</span></div>
+        <div class="kv"><span>Se Na⁺ corrigido ≥ 135</span><span class="v">trocar p/ SF 0,45%</span></div>
+        <div class="kv"><span>Glicemia &lt; 250</span><span class="v">associar solução glicosada</span></div>
+      </div>
+
+      <div class="card">
+        <h3>Insulina regular EV</h3>
+        <div class="kv"><span>Infusão</span><span class="v">0,1 UI/kg/h <small>(bólus 0,1 UI/kg opcional)</small></span></div>
+        <div class="kv"><span>Glicemia &lt; 250</span><span class="v">0,02–0,05 UI/kg/h + glicose</span></div>
+        <div class="kv"><span>Preparo da bomba</span><span class="v">50 UI + 50 mL SF = 1 UI/mL</span></div>
+        <div class="kv"><span>Taxa</span><span class="v">1 mL/h = 1 UI/h <small>(desprezar 20 mL)</small></span></div>
+      </div>
+
+      <div class="card k">
+        <h3>Potássio — o gate da insulina</h3>
+        <div class="kv"><span>K⁺ &lt; 3,3</span><span class="v" style="color:var(--danger)">NÃO iniciar insulina · repor 20–40 mEq/h</span></div>
+        <div class="kv"><span>K⁺ 3,3–5,2</span><span class="v">insulina + 20–30 mEq/L no soro</span></div>
+        <div class="kv"><span>K⁺ &gt; 5,2</span><span class="v">insulina · não repor · reavaliar</span></div>
+        <div class="kv"><span>Alvo</span><span class="v">4,0–5,0 mEq/L</span></div>
+        <p class="seetoo">Só repor K⁺ com diurese presente. Hipocalemia é a principal causa evitável de óbito.</p>
+      </div>
+
+      <div class="card">
+        <h3>Metas &amp; resolução</h3>
+        <div class="kv"><span>Queda da glicemia</span><span class="v">50–75 mg/dL/h</span></div>
+        <div class="kv"><span>Diurese mínima</span><span class="v">&gt; 0,5 mL/kg/h</span></div>
+        <div class="kv"><span>Resolução</span><span class="v">glicemia &lt; 200 <small>+ 2 de:</small></span></div>
+        <div class="kv"><span></span><span class="v">HCO₃⁻ ≥ 15 · pH &gt; 7,3 · AG ≤ 12</span></div>
+        <div class="kv"><span>Transição SC</span><span class="v">manter EV 1–2 h após a 1ª SC</span></div>
+      </div>
+
+      <div class="card">
+        <h3>Fórmulas de bolso</h3>
+        <div class="kv"><span>Na⁺ corrigido</span><span class="v">Na + 1,6 × (glic−100)/100</span></div>
+        <div class="kv"><span>Ânion gap</span><span class="v">Na − (Cl + HCO₃) <small>· 8–12</small></span></div>
+        <div class="kv"><span>Osm. efetiva</span><span class="v">2×Na + glic/18</span></div>
+      </div>
+
+      <div class="card danger">
+        <h3>Não esqueça / não faça</h3>
+        <div class="kv"><span>Bicarbonato</span><span class="v">só se pH &lt; 6,9 <small>(não rotineiro)</small></span></div>
+        <div class="kv"><span>Fósforo</span><span class="v">repor se &lt; 1,0 ou fraqueza/arritmia</span></div>
+        <div class="kv"><span>Criança</span><span class="v" style="color:var(--danger)">edema cerebral</span></div>
+        <div class="kv"><span>Glicemia &lt; 250</span><span class="v" style="color:var(--danger)">não suspender insulina</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHECKLIST ============ -->
+<section id="checklist">
+  <div class="wrap">
+    <h2>Checklist do plantão</h2>
+    <p class="lead">Sequência de condutas por fase. Os passos de insulina ficam <b>travados</b> até você confirmar que o potássio foi dosado — o gate que evita o erro mais perigoso. O progresso fica salvo neste navegador.</p>
+    <div class="toolbar">
+      <div class="progress" aria-hidden="true"><i id="progbar"></i></div>
+      <span class="progress-label" id="proglabel">0 / 0</span>
+      <button class="btn" id="resetbtn">↺ Reiniciar plantão</button>
+    </div>
+    <div id="checklist-root"></div>
+  </div>
+</section>
+
+<!-- ============ ALGORITMO ============ -->
+<section id="algoritmo">
+  <div class="wrap">
+    <h2>Algoritmo animado</h2>
+    <p class="lead">As três infusões correm <b>em paralelo no tempo</b> (não em sequência). O potássio governa o início da insulina; a glicemia &lt; 250 não para a insulina. Use os controles para avançar fase a fase.</p>
+    <div class="algo">
+      <div class="swim" id="swim">
+        <div aria-hidden="true"></div>
+        <div class="phhead" data-ph="0">Admissão · 1ª hora</div>
+        <div class="phhead" data-ph="1">Titulação (1/1 h)</div>
+        <div class="phhead" data-ph="2">Glicemia &lt; 250</div>
+        <div class="phhead" data-ph="3">Resolução · transição</div>
+
+        <div class="lanelab">Fluido</div>
+        <div class="cell lane-f" data-ph="0"><b>SF 0,9% 15–20 mL/kg</b><span class="mut">1ª hora</span></div>
+        <div class="cell lane-f" data-ph="1"><b>250–500 mL/h</b><span class="mut">0,45% se Na⁺ corr. normal</span></div>
+        <div class="cell lane-f" data-ph="2"><b>Associar glicose</b><span class="mut">two-bag / SG</span><span class="badge glu">+ glicose</span></div>
+        <div class="cell lane-f" data-ph="3"><b>Manutenção</b><span class="mut">até dieta oral</span></div>
+
+        <div class="lanelab">Insulina</div>
+        <div class="cell lane-i" data-ph="0"><b>Regular EV 0,1 UI/kg/h</b><span class="mut">só após checar K⁺</span><span class="badge gate">↑ K⁺ libera</span></div>
+        <div class="cell lane-i" data-ph="1"><b>Titular pela queda</b><span class="mut">50–75 mg/dL/h</span><span class="badge loop">↻ 1/1 h</span></div>
+        <div class="cell lane-i" data-ph="2"><b>0,02–0,05 UI/kg/h</b><span class="mut">não suspender</span></div>
+        <div class="cell lane-i" data-ph="3"><b>Insulina SC</b><span class="mut">manter EV 1–2 h</span><span class="badge res">✓</span></div>
+
+        <div class="lanelab">Potássio</div>
+        <div class="cell lane-k" data-ph="0"><b>K⁺ &lt; 3,3 → adiar insulina</b><span class="mut">repor 20–40 mEq/h</span></div>
+        <div class="cell lane-k" data-ph="1"><b>Manter K⁺ 4–5</b><span class="mut">20–30 mEq/L no soro</span></div>
+        <div class="cell lane-k" data-ph="2"><b>Vigiar hipocalemia</b><span class="mut">K⁺ seriado</span></div>
+        <div class="cell lane-k" data-ph="3"><b>Reavaliar eletrólitos</b><span class="mut"></span></div>
+      </div>
+
+      <div class="algo-caption" id="algocap"></div>
+
+      <div class="algo-controls">
+        <button class="btn primary" id="playbtn">▶ Reproduzir</button>
+        <button class="btn" id="stepbtn">⏭ Passo</button>
+        <button class="btn" id="algoreset">↺ Início</button>
+        <div class="stepdots" id="dots" aria-hidden="true"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DÚVIDAS ============ -->
+<section id="duvidas">
+  <div class="wrap">
+    <h2>Dúvidas &amp; armadilhas do plantão</h2>
+    <p class="lead">As situações imperfeitas e as perguntas que aparecem de verdade às 3 da manhã. <span class="qtag k">K⁺</span> potássio · <span class="qtag trap">armadilha</span> erro comum · <span class="qtag calc">conta</span> cálculo.</p>
+    <div id="faq-root"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div><b>Cetoacidose diabética — apoio ao plantão.</b> Adulto. Conteúdo educacional de apoio à beira-leito.</div>
+    <div class="src">Baseado em diretrizes de manejo da CAD (SBD/ADA). Sempre confirmar com o protocolo da sua instituição.</div>
+    <div class="src" id="ver"></div>
+  </div>
+</footer>
+
+<script>
+/* ---------- data: checklist ---------- */
+const PHASES=[
+ {n:1,t:"Chegada e diagnóstico",s:"reconhecer e coletar",items:[
+   {id:"dx",x:"Confirmar diagnóstico",note:"hiperglicemia + acidose (pH<7,3 / HCO₃<18) + cetose + AG>10"},
+   {id:"precip",x:"Procurar o fator precipitante",note:"infecção, IAM, omissão de insulina, drogas, iSGLT2"},
+   {id:"labs",x:"Coletar exames",note:"gaso venosa, Na/K/Cl, ureia/creatinina, glicemia, cetonemia, hemograma, EAS, ECG"},
+   {id:"peso",x:"Estimar peso e classificar gravidade"},
+   {id:"acesso",x:"Acesso venoso, monitorização e iniciar balanço hídrico"}
+ ]},
+ {n:2,t:"Primeira hora",s:"estabilizar",items:[
+   {id:"fluido1",x:"Iniciar SF 0,9% 15–20 mL/kg na 1ª hora"},
+   {id:"kdose",x:"Dosar o potássio",note:"obrigatório ANTES de liberar a insulina",gate:true,tag:"k"},
+   {id:"insulina",x:"Iniciar insulina regular EV 0,1 UI/kg/h",note:"só se K⁺ ≥ 3,3 mEq/L",requires:"kdose",tag:"k"},
+   {id:"krepoe",x:"Repor K⁺ conforme nível",note:"<3,3 repor e adiar insulina · 3,3–5,2 → 20–30 mEq/L no soro · só com diurese",requires:"kdose"}
+ ]},
+ {n:3,t:"Titulação horária (loop)",s:"reavaliar de hora em hora",items:[
+   {id:"glic",x:"Glicemia capilar de 1/1 h"},
+   {id:"titula",x:"Conferir queda 50–75 mg/dL/h",note:"se cai pouco, aumentar insulina e checar acesso/bomba"},
+   {id:"labseria",x:"Gasometria e eletrólitos a cada 2–4 h"},
+   {id:"diurese",x:"Registrar diurese e balanço acumulado"},
+   {id:"kmant",x:"Manter K⁺ entre 4–5 mEq/L"}
+ ]},
+ {n:4,t:"Glicemia < 250 mg/dL",s:"limiar — não pare a insulina",items:[
+   {id:"sg",x:"Associar solução glicosada"},
+   {id:"reduz",x:"Reduzir insulina para 0,02–0,05 UI/kg/h"},
+   {id:"naopara",x:"NÃO suspender a insulina",note:"a cetose só fecha quando o ânion gap normaliza",tag:"crit"}
+ ]},
+ {n:5,t:"Resolução e transição",s:"encerrar com segurança",items:[
+   {id:"res",x:"Confirmar resolução",note:"glicemia <200 + 2 de: HCO₃≥15 · pH>7,3 · AG≤12"},
+   {id:"scbasal",x:"Aplicar insulina basal SC (paciente comendo)"},
+   {id:"overlap",x:"Manter insulina EV por 1–2 h após a 1ª dose SC",note:"evita rebote da cetose",tag:"crit"},
+   {id:"desliga",x:"Desligar a bomba · glicemia capilar em 1 h e 3 h"}
+ ]}
+];
+
+/* ---------- data: faq ---------- */
+const FAQ=[
+ {tag:"trap",q:"A glicemia caiu para 230. Suspendo a insulina?",
+  a:"<b>Não.</b> Associe solução glicosada e <b>reduza</b> a insulina para 0,02–0,05 UI/kg/h, mas mantenha-a correndo. A insulina é o que fecha a cetose — ela só para na resolução, definida pelo <b>ânion gap</b>, não pela glicemia."},
+ {tag:"k",q:"K⁺ veio 3,2. Já começo a insulina?",
+  a:"<b>Não.</b> Reponha potássio 20–40 mEq/h e <b>adie a insulina</b> até K⁺ ≥ 3,3 mEq/L. A insulina joga K⁺ para dentro da célula; iniciar com K baixo pode causar hipocalemia grave/arritmia — a principal causa evitável de óbito na CAD."},
+ {tag:"trap",q:"Dou bicarbonato?",
+  a:"Em geral <b>não</b>. Só considerar se pH &lt; 6,9 (e ainda controverso). A acidose corrige com fluido + insulina. Bicarbonato precoce traz risco de hipocalemia, acidose paradoxal do SNC e edema cerebral."},
+ {tag:"calc",q:"Sódio veio 128. Preocupa?",
+  a:"Calcule o <b>sódio corrigido</b> = Na + 1,6 × (glicemia−100)/100. Quase sempre é pseudo-hiponatremia diluicional pela hiperglicemia. Use o <b>corrigido</b> para decidir SF 0,9% (corrigido baixo) vs 0,45% (corrigido normal/alto)."},
+ {tag:"trap",q:"A glicemia está caindo rápido demais (>90–100/h).",
+  a:"<b>Reduza a infusão de insulina.</b> Queda glicêmica e de osmolaridade muito rápidas aumentam o risco de edema cerebral (sobretudo em jovens). Ao atingir &lt; 250 mg/dL, associe glicose para desacoplar o controle da cetose do da glicemia."},
+ {tag:"trap",q:"Não tenho bomba de infusão. E agora?",
+  a:"Use o esquema <b>two-bag</b> (duas bolsas em Y, mesma taxa e mesma reposição de K⁺, uma com glicose — você varia a proporção). Sem two-bag, monte SG manualmente e troque a solução no limiar. Em CAD leve/moderada há protocolos de insulina regular SC/IM horária (0,1 UI/kg) — evite bólus EV repetidos sem monitorização."},
+ {tag:"k",q:"Paciente anúrico/oligúrico — reponho potássio?",
+  a:"<b>Cautela.</b> Só reponha K⁺ com diurese estabelecida. No anúrico, o risco vira hipercalemia: reavalie função renal, faça K⁺ seriado e ECG antes de repor. Hidrate e reavalie a diurese."},
+ {tag:"calc",q:"CAD euglicêmica? Glicemia 180 mas acidótico.",
+  a:"Existe sim — clássica com <b>iSGLT2</b>, gestantes e jejum prolongado. Há acidose + cetose com glicemia &lt; 200–250. Suspenda o iSGLT2, trate como CAD e <b>associe glicose mais cedo</b> (você já começa perto do limiar) para poder manter a insulina."},
+ {tag:"trap",q:"A glicemia não cai apesar da insulina. O que checo?",
+  a:"Na ordem: <b>acesso e bomba</b> (volume morto não desprezado, infiltração, equipo), <b>dose/diluição</b> corretas, soro realmente correndo, e o <b>fator precipitante</b> não controlado (sepse, IAM, corticoide). Se tudo certo, aumente a taxa de insulina."},
+ {tag:"trap",q:"Apliquei a insulina SC — já desligo a bomba?",
+  a:"<b>Não.</b> Mantenha a infusão EV por <b>1–2 h de sobreposição</b> após a primeira dose SC. A insulina EV tem meia-vida de minutos; desligar antes da SC agir deixa o paciente sem insulina e a cetose rebota."},
+ {tag:"calc",q:"É CAD ou estado hiperglicêmico hiperosmolar (EHH)?",
+  a:"EHH: glicemia muito alta (&gt; 600), <b>osmolaridade &gt; 320</b>, cetose ausente/leve e pH &gt; 7,3. CAD: acidose + cetose marcantes. Pode haver sobreposição (CAD + hiperosmolar). No EHH a hidratação é ainda mais central e a insulina, mais cautelosa."},
+ {tag:"trap",q:"Reponho fósforo e magnésio de rotina?",
+  a:"<b>Não de rotina.</b> Reponha fósforo se &lt; 1,0 mg/dL ou se houver fraqueza muscular/respiratória, rabdomiólise ou arritmia. Corrija magnésio se baixo, sobretudo se for difícil manter o potássio."}
+];
+
+/* ---------- render checklist ---------- */
+const KEY="cad_checklist_v1";
+let state=JSON.parse(localStorage.getItem(KEY)||"{}");
+const root=document.getElementById("checklist-root");
+let allIds=[];
+PHASES.forEach(ph=>{
+  ph.items.forEach(it=>allIds.push(it.id));
+  const el=document.createElement("div");el.className="phase";
+  el.innerHTML=`<div class="ph-head"><span class="ph-num">${ph.n}</span>
+     <span class="ph-title">${ph.t}</span><span class="ph-sub">${ph.s}</span></div>
+     <ul class="items">${ph.items.map(it=>itemHTML(it)).join("")}</ul>`;
+  root.appendChild(el);
+});
+function itemHTML(it){
+  const checked=state[it.id]?"checked":"";
+  const tag=it.tag==="k"?'<span class="tag k">K⁺</span>':it.tag==="crit"?'<span class="tag crit">crítico</span>':"";
+  const note=it.note?`<span class="note">${it.note}</span>`:"";
+  return `<li data-id="${it.id}" data-requires="${it.requires||""}" ${it.gate?'data-gate="1"':""}>
+    <input type="checkbox" id="ck_${it.id}" ${checked}>
+    <label for="ck_${it.id}">${it.x}${tag}${note}</label></li>`;
+}
+root.addEventListener("change",e=>{
+  if(e.target.matches('input[type=checkbox]')){
+    const id=e.target.id.replace("ck_","");
+    state[id]=e.target.checked; save();
+  }
+});
+function save(){localStorage.setItem(KEY,JSON.stringify(state));refresh();}
+function refresh(){
+  const kDone=!!state["kdose"];
+  document.querySelectorAll("#checklist-root li").forEach(li=>{
+    const id=li.dataset.id, req=li.dataset.requires, cb=li.querySelector("input");
+    cb.checked=!!state[id];
+    li.classList.toggle("done",!!state[id]);
+    li.classList.toggle("gate",li.dataset.gate==="1");
+    const locked=req && !state[req];
+    li.classList.toggle("locked",locked);
+    cb.disabled=locked;
+    let lock=li.querySelector(".lockmsg");
+    if(locked){
+      cb.checked=false; state[id]=false;
+      if(!lock){lock=document.createElement("span");lock.className="lockmsg";lock.textContent="🔒 dose o K⁺ antes";li.querySelector("label").appendChild(lock);}
+    } else if(lock){lock.remove();}
+  });
+  const done=allIds.filter(i=>state[i]).length;
+  document.getElementById("progbar").style.width=(done/allIds.length*100)+"%";
+  document.getElementById("proglabel").textContent=`${done} / ${allIds.length}`;
+}
+document.getElementById("resetbtn").onclick=()=>{
+  if(confirm("Reiniciar o checklist deste plantão? Isso desmarca tudo.")){state={};save();}
+};
+refresh();
+
+/* ---------- algorithm animation ---------- */
+const CAPS=[
+ "<b>Admissão · 1ª hora.</b> Inicie SF 0,9% 15–20 mL/kg. <b>Dose o K⁺ antes da insulina</b> — se &lt; 3,3, reponha e adie a insulina. Com K⁺ ≥ 3,3, comece insulina regular EV 0,1 UI/kg/h.",
+ "<b>Titulação (1/1 h).</b> Ajuste a insulina pela <b>velocidade de queda</b> (50–75 mg/dL/h), não por um valor fixo. Monitorize glicemia, sinais vitais, diurese e balanço de hora em hora; eletrólitos a cada 2–4 h.",
+ "<b>Glicemia &lt; 250.</b> Associe glicose e <b>reduza</b> a insulina para 0,02–0,05 UI/kg/h. <b>Não suspenda</b> — a cetose ainda não fechou. Mantenha o K⁺ entre 4 e 5.",
+ "<b>Resolução · transição.</b> Glicemia &lt; 200 + 2 de (HCO₃≥15, pH&gt;7,3, AG≤12). Aplique insulina SC e <b>mantenha a EV por 1–2 h</b> antes de desligar a bomba."
+];
+const NPH=4;
+const swim=document.getElementById("swim");
+const cap=document.getElementById("algocap");
+const dots=document.getElementById("dots");
+for(let i=0;i<NPH;i++){const d=document.createElement("i");dots.appendChild(d);}
+let cur=-1, timer=null;
+function setPhase(p){
+  cur=p;
+  swim.querySelectorAll(".cell,.phhead").forEach(c=>{
+    c.classList.toggle("on",+c.dataset.ph===p);
+  });
+  swim.querySelectorAll(".badge").forEach(b=>{
+    const cell=b.closest(".cell");
+    b.classList.toggle("show",cell.classList.contains("on"));
+  });
+  dots.querySelectorAll("i").forEach((d,i)=>d.classList.toggle("on",i===p));
+  cap.innerHTML=p<0?"Pressione <b>reproduzir</b> para acompanhar o fluxo no tempo.":CAPS[p];
+}
+function stop(){if(timer){clearInterval(timer);timer=null;}playbtn.innerHTML="▶ Reproduzir";}
+function play(){
+  if(timer){stop();return;}
+  if(cur>=NPH-1)cur=-1;
+  playbtn.innerHTML="⏸ Pausar";
+  timer=setInterval(()=>{
+    if(cur>=NPH-1){stop();return;}
+    setPhase(cur+1);
+  },2600);
+  if(cur<0)setPhase(0);
+}
+const playbtn=document.getElementById("playbtn");
+playbtn.onclick=play;
+document.getElementById("stepbtn").onclick=()=>{stop();setPhase((cur+1)%NPH);};
+document.getElementById("algoreset").onclick=()=>{stop();setPhase(-1);};
+setPhase(-1);
+
+/* ---------- render faq ---------- */
+const froot=document.getElementById("faq-root");
+const TAGLABEL={k:"K⁺",trap:"armadilha",calc:"conta"};
+FAQ.forEach(f=>{
+  const d=document.createElement("details");d.className="faq";
+  d.innerHTML=`<summary><span class="qtag ${f.tag}">${TAGLABEL[f.tag]}</span>${f.q}
+     <span class="chev" aria-hidden="true">▶</span></summary>
+     <div class="body"><div class="ans">${f.a}</div></div>`;
+  froot.appendChild(d);
+});
+
+/* ---------- nav active state ---------- */
+const links=[...document.querySelectorAll("nav.tabs a")];
+const secs=links.map(a=>document.querySelector(a.getAttribute("href")));
+const obs=new IntersectionObserver(es=>{
+  es.forEach(en=>{if(en.isIntersecting){
+    const id="#"+en.target.id;
+    links.forEach(a=>a.classList.toggle("active",a.getAttribute("href")===id));
+  }});
+},{rootMargin:"-45% 0px -50% 0px"});
+secs.forEach(s=>obs.observe(s));
+
+document.getElementById("ver").textContent="Versão "+new Date().toISOString().slice(0,10)+" · página única, funciona offline.";
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+missfont.log
+
+# Preview/editor
+.claude/
+
+# Exploratory design variants (not part of the public tool)
+CAD_v*.pdf
+CAD_plantao_PB_A4.pdf
+cad-2pg-test.*
+cad-index.*
+cad-tall.*
+cad_site.tsx
